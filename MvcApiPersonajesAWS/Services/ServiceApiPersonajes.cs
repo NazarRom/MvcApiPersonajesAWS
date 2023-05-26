@@ -14,6 +14,26 @@ namespace MvcApiPersonajesAWS.Services
             this.Header = new MediaTypeWithQualityHeaderValue("applicatio/json");
         }
 
+
+        public async Task<string> TestApiAsync()
+        {
+            string request = "/api/Personajes/";
+            //utilizamos un manejador para la peticion de httpclient
+            var handler = new HttpClientHandler();
+            //indicamos al manejador como se comportatara al recibir peticiones
+            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
+            {
+                return true;
+            };
+            HttpClient client = new HttpClient(handler);
+            client.BaseAddress = new Uri(this.UrlApi);
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Accept.Add(this.Header);
+            HttpResponseMessage response = await client.GetAsync(request);
+            return "Respuesta " + response.StatusCode;
+        }
+
+
         private async Task<T> CallApiAsync<T>
        (string request)
         {
