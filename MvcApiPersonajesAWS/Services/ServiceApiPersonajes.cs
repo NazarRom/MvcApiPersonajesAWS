@@ -31,29 +31,40 @@ namespace MvcApiPersonajesAWS.Services
             client.DefaultRequestHeaders.Accept.Add(this.Header);
             HttpResponseMessage response = await client.GetAsync(request);
             return "Respuesta " + response.StatusCode;
+
         }
 
 
         private async Task<T> CallApiAsync<T>
        (string request)
         {
-            using (HttpClient client = new HttpClient())
+            using (HttpClientHandler handler = new HttpClientHandler())
             {
-                client.BaseAddress = new Uri(this.UrlApi);
-                client.DefaultRequestHeaders.Clear();
-                client.DefaultRequestHeaders.Accept.Add(this.Header);
-                HttpResponseMessage response =
-                    await client.GetAsync(request);
-                if (response.IsSuccessStatusCode)
+                //indicamos al manejador como se comportatara al recibir peticiones
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) =>
                 {
-                    T data = await response.Content.ReadAsAsync<T>();
-                    return data;
-                }
-                else
+                    return true;
+                };
+
+                using (HttpClient client = new HttpClient(handler))
                 {
-                    return default(T);
+                    client.BaseAddress = new Uri(this.UrlApi);
+                    client.DefaultRequestHeaders.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(this.Header);
+                    HttpResponseMessage response =
+                        await client.GetAsync(request);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        T data = await response.Content.ReadAsAsync<T>();
+                        return data;
+                    }
+                    else
+                    {
+                        return default(T);
+                    }
                 }
             }
+
         }
 
         public async Task<List<Personaje>> GetPersonajesAsync()
