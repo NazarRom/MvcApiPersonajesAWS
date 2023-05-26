@@ -1,0 +1,52 @@
+﻿
+<button type="button" id="getPersonajes" class="btn btn-outline-dark">
+    Personajes
+</button>
+
+
+<table class="table table-bordered" id="tablapersonajes">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Localidad</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+
+@section Scripts {
+    <script>
+        var urlApi = "https://35.173.213.247";
+        $(document).ready(function() {
+            $("#getPersonajes").click(function() {
+                var request = "/api/Personajes";
+                $.ajax({
+                    url: urlApi + request,
+                    method: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        var html = "";
+                        $.each(data, function(index, pers) {
+                            html += `
+                            <tr>
+                                <td>${pers.idPersonaje}</td>
+                                <td>${pers.nombre}</td>
+                                <td><img src='${pers.imagen}' style="width:200px;height:200px;" /></td>
+                            </tr>`;
+
+                            $("#tablapersonajes tbody").html(html);
+                        })
+                    }
+                })
+
+            })
+
+        });
+    </script>
+     }
+
+
+
